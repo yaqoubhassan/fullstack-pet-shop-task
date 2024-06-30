@@ -32,9 +32,7 @@ class JwtAuthMiddleware
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $request->setUserResolver(function () use ($user) {
-            return $user;
-        });
+        $request->attributes->set('user', $user);
 
         return $next($request);
     }
