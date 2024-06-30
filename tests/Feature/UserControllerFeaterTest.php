@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -109,5 +110,44 @@ class UserControllerFeaterTest extends TestCase
 
         $token = JwtToken::where('user_id', $user->id)->first();
         $this->assertNotNull($token);
+    }
+
+    public function testUserCanLoginWithValidCredentials()
+    {
+        $password = 'secret123';
+        $user = User::factory()->create();
+
+        $payload = [
+            'email' => $user->email,
+            'password' => $password,
+        ];
+
+        $response = $this->postJson(route('user.login'), $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'data' => ['token'],
+            'error',
+            'errors',
+            'extra',
+        ]);
+    }
+
+    public function testUserCannotLoginWithInvalidCredentials()
+    {
+        $user = User::factory()->create();
+
+        $payload = [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ];
+
+        $response = $this->postJson(route('user.login'), $payload);
+
+        $response->assertStatus(401);
+        $response->assertJson([
+            'error' => 'Unauthorized',
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\JwtService;
+use App\Models\User;
 use App\Http\Controllers\API\UserController;
 
 class UserControllerUnitTest extends TestCase
@@ -36,5 +37,16 @@ class UserControllerUnitTest extends TestCase
             'name' => 'avatar.jpg',
             'path' => 'avatars/' . $file->hashName(),
         ]);
+    }
+
+    public function testGenerateToken()
+    {
+        $jwtService = new JwtService();
+        $user = User::factory()->create();
+
+        $token = $jwtService->generateToken($user);
+
+        $this->assertNotEmpty($token);
+        $this->assertIsString($token);
     }
 }
