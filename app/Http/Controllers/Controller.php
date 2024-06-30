@@ -13,7 +13,10 @@ namespace App\Http\Controllers;
  *     scheme="bearer",
  *     bearerFormat="JWT"
  * )
-
+ *  @OA\Tag(
+ *     name="User",
+ *     description="User API endpoint"
+ * )
  */
 abstract class Controller
 {
