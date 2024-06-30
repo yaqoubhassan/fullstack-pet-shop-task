@@ -5,14 +5,16 @@ namespace App\Http\Controllers\API;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Services\JwtService;
 use App\Models\User;
+use App\Models\JwtToken;
 use App\Models\File;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Controllers\Controller;
-use App\Models\JwtToken;
+use App\Http\Requests\LoginRequest;
 
 class UserController extends Controller
 {
@@ -65,7 +67,6 @@ class UserController extends Controller
     *           ),
     *       ),
     *     ),
-    *     @OA\Response(response="200", description="OK", @OA\JsonContent()),
     *     @OA\Response(response="201", description="OK", @OA\JsonContent()),
     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent()),
     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent()),
@@ -139,6 +140,62 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+    * @OA\Schema(
+    *     schema="StoreUserRequest",
+    *     required={"name", "email", "password"},
+    *     @OA\Property(property="name", type="string"),
+    *     @OA\Property(property="email", type="string", format="email"),
+    *     @OA\Property(property="password", type="string", format="password"),
+    *     @OA\Property(property="avatar", type="string", format="binary"),
+    * )
+    */
+
+    /**
+    * @OA\Post(
+    *     path="/api/v1/user/login",
+    *     tags={"User"},
+    *     summary="Login a User Account",
+    *     @OA\RequestBody(
+    *       @OA\JsonContent(),
+    *       @OA\MediaType(
+    *           mediaType="application/x-www-form-urlencoded",
+    *           @OA\Schema(
+    *               type="object",
+    *               required={"email", "password"},
+    *               @OA\Property(property="email", type="string", format="email", description="User email", example=""),
+    *               @OA\Property(property="password", type="string", example="", description="User password"),
+    *           ),
+    *       ),
+    *     ),
+    *     @OA\Response(response="200", description="OK", @OA\JsonContent()),
+    *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent()),
+    *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent()),
+    *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent()),
+    *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent())
+    * )
+    */
+    public function login(LoginRequest $request)
+    {
+        if (Auth::attempt($request->validated())) {
+            $user = User::where('id', Auth::user()->id)->first();
+            $token = $this->jwtService->generateToken($user);
+
+            $response = [
+                'success' => 1,
+                'data' => [
+                  'token' => $token
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ];
+            return response()->json($response, 200);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**

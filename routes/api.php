@@ -5,3 +5,4 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\UserController;
 
 Route::post('v1/user/create', [UserController::class, 'store'])->name('user.create');
+Route::post('v1/user/login', [UserController::class, 'login'])->name('user.login');
