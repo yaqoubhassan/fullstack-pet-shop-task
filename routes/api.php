@@ -11,5 +11,6 @@ Route::prefix('v1/user')->group(function () {
         Route::get('logout', [UserController::class, 'logout'])->name('user.logout');
 
         Route::get('/', [UserController::class, 'index'])->name('user.index');
+        Route::put('edit', [UserController::class, 'update'])->name('user.update');
     });
 });
