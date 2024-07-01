@@ -4,10 +4,11 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\JwtService;
 use App\Models\User;
 use App\Models\JwtToken;
 use App\Models\File;
@@ -16,6 +17,14 @@ class UserControllerFeaterTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
+
+    protected $jwtService;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->jwtService = new JwtService();
+    }
 
     public function testUserCreationWithAvatar()
     {
@@ -148,6 +157,32 @@ class UserControllerFeaterTest extends TestCase
         $response->assertStatus(401);
         $response->assertJson([
             'error' => 'Unauthorized',
+        ]);
+    }
+
+    public function testUserCanLogoutSuccessfully()
+    {
+        $user = User::factory()->create();
+
+        $token = $this->jwtService->generateToken($user);
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $token,
+        ];
+
+        $response = $this->json('GET', route('user.logout'), [], $headers);
+
+        $response->assertStatus(200);
+
+        // Assert token is invalidated in the database
+        $this->assertDatabaseMissing('jwt_tokens', [
+            'user_id' => $user->id,
+            'expires_at' => Carbon::now()->addHour(),  // The token should no longer be valid
+        ]);
+
+        $this->assertDatabaseHas('jwt_tokens', [
+            'user_id' => $user->id,
+            'expires_at' => Carbon::now(),  // Token should be expired
         ]);
     }
 }
