@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Services\JwtService;
 use App\Models\User;
-use App\Models\JwtToken;
 use App\Models\File;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\StoreUserRequest;
@@ -54,16 +53,21 @@ class UserController extends Controller
      *           mediaType="application/x-www-form-urlencoded",
      *           @OA\Schema(
      *               type="object",
-     *               required={"first_name", "last_name", "email", "password", "password_confirmation", "phone_number", "address"},
+     *               required={"first_name", "last_name", "email", "password",
+     *               "password_confirmation", "phone_number", "address"},
      *               @OA\Property(property="first_name", type="string", description="User firstname", example="Yakubu"),
      *               @OA\Property(property="last_name", type="string", description="User lastname", example="Alhassan"),
-     *               @OA\Property(property="email", type="string", format="email", description="User email", example="yakubu@test.com"),
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example="yakubu@test.com"),
      *               @OA\Property(property="password", type="string", example="secret123", description="User password"),
      *               @OA\Property(property="password_confirmation", example="secret123", description="User password"),
      *               @OA\Property(property="avatar", type="string", description="Avatar image UUID", example=""),
-     *               @OA\Property(property="address", type="string", description="User main address", example="Accra, Ghana"),
-     *               @OA\Property(property="phone_number", type="string", description="User main phone number", example="+233244112288"),
-     *               @OA\Property(property="is_marketing", type="string", description="User marketing preferences", example=""),
+     *               @OA\Property(property="address", type="string",
+     *               description="User main address", example="Accra, Ghana"),
+     *               @OA\Property(property="phone_number", type="string",
+     *               description="User main phone number", example="+233244112288"),
+     *               @OA\Property(property="is_marketing", type="string",
+     *               description="User marketing preferences", example=""),
      *           ),
      *       ),
      *     ),
@@ -141,17 +145,6 @@ class UserController extends Controller
     }
 
     /**
-     * @OA\Schema(
-     *     schema="StoreUserRequest",
-     *     required={"name", "email", "password"},
-     *     @OA\Property(property="name", type="string"),
-     *     @OA\Property(property="email", type="string", format="email"),
-     *     @OA\Property(property="password", type="string", format="password"),
-     *     @OA\Property(property="avatar", type="string", format="binary"),
-     * )
-     */
-
-    /**
      * @OA\Post(
      *     path="/api/v1/user/login",
      *     tags={"User"},
@@ -163,7 +156,8 @@ class UserController extends Controller
      *           @OA\Schema(
      *               type="object",
      *               required={"email", "password"},
-     *               @OA\Property(property="email", type="string", format="email", description="User email", example=""),
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
      *               @OA\Property(property="password", type="string", example="", description="User password"),
      *           ),
      *       ),
@@ -213,7 +207,6 @@ class UserController extends Controller
     {
         $user = $request->attributes->get('user');
         $this->jwtService->invalidateToken($user);
-        Auth::logout();
 
         $response = [
             'success' => 1,
