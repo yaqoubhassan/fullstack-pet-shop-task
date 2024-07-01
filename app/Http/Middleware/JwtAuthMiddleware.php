@@ -28,6 +28,7 @@ class JwtAuthMiddleware
         $userUuid = $this->jwtService->getUserUuidFromToken($token);
         $user = User::where('uuid', $userUuid)->first();
 
+        auth()->setUser($user);
         $request->attributes->set('user', $user);
 
         return $next($request);

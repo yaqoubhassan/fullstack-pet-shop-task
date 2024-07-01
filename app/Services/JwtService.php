@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use Lcobucci\JWT\Validation\Validator;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
 use Lcobucci\JWT\Validation\Constraint\ValidAt;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\Clock\SystemClock;
 use Illuminate\Support\Str;
@@ -31,7 +33,7 @@ class JwtService
     public function generateToken(User $user)
     {
         $now = new \DateTimeImmutable();
-        $expiresAt = $now->modify('+1 hour');
+        $expiresAt = $now->modify('+6 hour');
 
         $uniqueId = (string) Str::uuid();
 
