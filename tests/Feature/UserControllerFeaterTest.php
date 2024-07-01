@@ -229,4 +229,37 @@ class UserControllerFeaterTest extends TestCase
                 'error' => 'Unauthorized'
             ]);
     }
+
+    public function testAuthenticatedUserCanUpdateTheirAccountDetails()
+    {
+        $user = User::factory()->create();
+        $token = $this->jwtService->generateToken($user);
+
+        $newData = [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'email' => $this->faker->unique()->safeEmail,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+            'address' => $this->faker->address,
+            'phone_number' => $this->faker->phoneNumber,
+            'is_marketing' => $this->faker->boolean,
+        ];
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
+                         ->putJson(route('user.update'), $newData);
+
+        // Assert the response status
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'first_name' => $newData['first_name'],
+            'last_name' => $newData['last_name'],
+            'email' => $newData['email'],
+            'address' => $newData['address'],
+            'phone_number' => $newData['phone_number'],
+            'is_marketing' => $newData['is_marketing'],
+        ]);
+    }
 }
