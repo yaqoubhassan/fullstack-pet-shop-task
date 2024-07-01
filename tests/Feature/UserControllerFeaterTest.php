@@ -94,25 +94,25 @@ class UserControllerFeaterTest extends TestCase
         $response = $this->postJson(route('user.create'), $data);
 
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'success',
-                     'data' => [
-                         'uuid',
-                         'first_name',
-                         'last_name',
-                         'email',
-                         'avatar',
-                         'address',
-                         'phone_number',
-                         'is_marketing',
-                         'created_at',
-                         'updated_at',
-                         'token'
-                     ],
-                     'error',
-                     'errors',
-                     'extra'
-                 ]);
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    'uuid',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'avatar',
+                    'address',
+                    'phone_number',
+                    'is_marketing',
+                    'created_at',
+                    'updated_at',
+                    'token'
+                ],
+                'error',
+                'errors',
+                'extra'
+            ]);
 
         $user = User::where('email', 'jane.doe@example.com')->first();
         $this->assertNotNull($user);
@@ -154,9 +154,13 @@ class UserControllerFeaterTest extends TestCase
 
         $response = $this->postJson(route('user.login'), $payload);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJson([
-            'error' => 'Unauthorized',
+            'success' => 0,
+            'data' => [],
+            'error' => 'Failed to authenticate user',
+            'errors' => [],
+            'extra' => []
         ]);
     }
 
@@ -184,5 +188,45 @@ class UserControllerFeaterTest extends TestCase
             'user_id' => $user->id,
             'expires_at' => Carbon::now(),  // Token should be expired
         ]);
+    }
+
+    public function testItReturnsTheAuthenticatedUserData()
+    {
+        // Create a user
+        $user = User::factory()->create();
+
+        // Generate a JWT token for the user
+        $token = $this->jwtService->generateToken($user);
+
+        // Make the GET request with the JWT token in the Authorization header
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson(route('user.index'));
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => 1,
+                'data' => [
+                    'uuid' => $user->uuid,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => [],
+            ]);
+    }
+
+    public function testUnAuthenticatedUserCannotViewTheirData()
+    {
+        User::factory()->create();
+
+        $response = $this->getJson(route('user.index'));
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'error' => 'Unauthorized'
+            ]);
     }
 }
