@@ -23,24 +23,31 @@ class UserController extends Controller
     {
         $this->jwtService = $jwtService;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
-     * @OA\Schema(
-     *     schema="StoreUserRequest",
-     *     required={"name", "email", "password"},
-     *     @OA\Property(property="name", type="string"),
-     *     @OA\Property(property="email", type="string", format="email"),
-     *     @OA\Property(property="password", type="string", format="password"),
-     *     @OA\Property(property="avatar", type="string", format="binary"),
+     * @OA\Get(
+     *     path="/api/v1/user",
+     *     tags={"User"},
+     *     summary="View a User Account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response="200", description="OK"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
      * )
      */
+    public function index(Request $request)
+    {
+        $response = [
+            'success' => 1,
+            'data' => new UserResource($request->attributes->get('user')),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 200);
+    }
 
     /**
      * @OA\Post(
@@ -71,22 +78,20 @@ class UserController extends Controller
      *           ),
      *       ),
      *     ),
-     *     @OA\Response(response="201", description="OK", @OA\JsonContent()),
-     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent()),
-     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent()),
-     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent()),
-     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent())
+     *     @OA\Response(response="201", description="OK"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
      * )
      */
     public function store(StoreUserRequest $request)
     {
-        // Begin a transaction
         DB::beginTransaction();
 
         try {
             $data = $request->validated();
 
-            // Handle file upload
             if ($request->hasFile('avatar')) {
                 $data['avatar'] = $this->handleFileUpload($request->file('avatar'));
             }
@@ -96,13 +101,10 @@ class UserController extends Controller
 
             $user = User::create($data);
 
-            // Generate JWT token
             $token = $this->jwtService->generateToken($user);
 
-            // Commit the transaction
             DB::commit();
 
-            // Prepare the response data
             $response = [
                 'success' => 1,
                 'data' => new UserResource($user->fresh(), $token),
@@ -113,7 +115,6 @@ class UserController extends Controller
 
             return response()->json($response, 201);
         } catch (\Exception $e) {
-            // Rollback the transaction if something goes wrong
             DB::rollBack();
 
             return response()->json(['error' => $e->getMessage()], 500);
@@ -162,11 +163,11 @@ class UserController extends Controller
      *           ),
      *       ),
      *     ),
-     *     @OA\Response(response="200", description="OK", @OA\JsonContent()),
-     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent()),
-     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent()),
-     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent()),
-     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent())
+     *     @OA\Response(response="200", description="OK"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
      * )
      */
     public function login(LoginRequest $request)
@@ -187,7 +188,13 @@ class UserController extends Controller
             return response()->json($response, 200);
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        return response()->json([
+            'success' => 0,
+            'data' => [],
+            'error' => 'Failed to authenticate user',
+            'errors' => [],
+            'extra' => []
+        ], 422);
     }
 
     /**
