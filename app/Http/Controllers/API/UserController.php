@@ -79,11 +79,11 @@ class UserController extends Controller
      *           ),
      *       ),
      *     ),
-     *     @OA\Response(response="201", description="OK"),
-     *     @OA\Response(response="401", description="Unauthorized"),
-     *     @OA\Response(response="404", description="Page Not Found"),
-     *     @OA\Response(response="422", description="Unprocessable Entity"),
-     *     @OA\Response(response="500", description="Internal server error")
+     *     @OA\Response(response="201", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
      * )
      */
     public function store(StoreUserRequest $request)
@@ -173,11 +173,30 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/v1/user",
+     *     tags={"User"},
+     *     summary="Delete a User Account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response="200", description="OK"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
-    public function destroy(string $id)
+    public function destroy()
     {
-        //
+        $user = User::find(auth()->id());
+        $user->delete();
+        $response = [
+                'success' => 1,
+                'data' => [],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -247,7 +266,7 @@ class UserController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = $request->attributes->get('user');
+        $user = User::find(auth()->id());
         $this->jwtService->invalidateToken($user);
 
         $response = [
