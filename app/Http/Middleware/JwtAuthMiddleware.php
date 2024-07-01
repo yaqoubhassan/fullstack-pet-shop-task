@@ -28,10 +28,6 @@ class JwtAuthMiddleware
         $userUuid = $this->jwtService->getUserUuidFromToken($token);
         $user = User::where('uuid', $userUuid)->first();
 
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         $request->attributes->set('user', $user);
 
         return $next($request);
