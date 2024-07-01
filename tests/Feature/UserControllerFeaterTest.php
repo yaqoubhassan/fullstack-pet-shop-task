@@ -192,13 +192,10 @@ class UserControllerFeaterTest extends TestCase
 
     public function testItReturnsTheAuthenticatedUserData()
     {
-        // Create a user
         $user = User::factory()->create();
 
-        // Generate a JWT token for the user
         $token = $this->jwtService->generateToken($user);
 
-        // Make the GET request with the JWT token in the Authorization header
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->getJson(route('user.index'));
@@ -249,7 +246,6 @@ class UserControllerFeaterTest extends TestCase
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
                          ->putJson(route('user.update'), $newData);
 
-        // Assert the response status
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('users', [
@@ -261,5 +257,26 @@ class UserControllerFeaterTest extends TestCase
             'phone_number' => $newData['phone_number'],
             'is_marketing' => $newData['is_marketing'],
         ]);
+    }
+
+    public function testDeleteUser()
+    {
+        $user = User::factory()->create();
+        $token = $this->jwtService->generateToken($user);
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
+                         ->deleteJson(route('user.delete'));
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'success' => true,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ]);
+
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
 }
