@@ -14,6 +14,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -122,19 +123,53 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Put(
+     *     path="/api/v1/user/edit",
+     *     tags={"User"},
+     *     summary="Update a User Account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(property="first_name", type="string", description="User firstname", example=""),
+     *               @OA\Property(property="last_name", type="string", description="User lastname", example=""),
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
+     *               @OA\Property(property="password", type="string", example="", description="User password"),
+     *               @OA\Property(property="password_confirmation", example="", description="User password"),
+     *               @OA\Property(property="avatar", type="string", description="Avatar image UUID", example=""),
+     *               @OA\Property(property="address", type="string",
+     *               description="User main address", example=""),
+     *               @OA\Property(property="phone_number", type="string",
+     *               description="User main phone number", example=""),
+     *               @OA\Property(property="is_marketing", type="string",
+     *               description="User marketing preferences", example=""),
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="201", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
+     * )
      */
-    public function show(string $id)
+    public function update(UpdateUserRequest $request)
     {
-        //
-    }
+        $user = User::find(auth()->id());
+        $user->update($request->all());
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+        $response = [
+                'success' => 1,
+                'data' => new UserResource($user->fresh()),
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ];
+        return response()->json($response, 201);
     }
 
     /**
