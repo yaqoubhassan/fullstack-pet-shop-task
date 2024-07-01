@@ -21,7 +21,7 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'uuid' => $this->uuid,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
@@ -32,7 +32,12 @@ class UserResource extends JsonResource
             'is_marketing' => $this->is_marketing,
             'updated_at' => $this->updated_at->toISOString(),
             'created_at' => $this->created_at->toISOString(),
-            'token' => $this->token,
         ];
+
+        if ($this->token !== null) {
+            $data['token'] = $this->token;
+        }
+
+        return $data;
     }
 }
