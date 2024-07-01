@@ -5,6 +5,37 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "View a User Account",
+                "operationId": "20eb061aa06557820b4055972c4b42a2",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Page Not Found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user/create": {
             "post": {
                 "tags": [
@@ -82,44 +113,19 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "OK"
                     },
                     "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Unauthorized"
                     },
                     "404": {
-                        "description": "Page Not Found",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Page Not Found"
                     },
                     "422": {
-                        "description": "Unprocessable Entity",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Unprocessable Entity"
                     },
                     "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Internal server error"
                     }
                 }
             }
@@ -162,44 +168,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "OK"
                     },
                     "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Unauthorized"
                     },
                     "404": {
-                        "description": "Page Not Found",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Page Not Found"
                     },
                     "422": {
-                        "description": "Unprocessable Entity",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Unprocessable Entity"
                     },
                     "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                        "description": "Internal server error"
                     }
                 }
             }
