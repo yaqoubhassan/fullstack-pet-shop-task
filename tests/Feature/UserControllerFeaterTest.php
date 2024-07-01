@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use Mockery;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\JwtService;
+use App\Repositories\UserRepository;
 use App\Models\User;
 use App\Models\JwtToken;
 use App\Models\File;
@@ -244,7 +246,7 @@ class UserControllerFeaterTest extends TestCase
         ];
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-                         ->putJson(route('user.update'), $newData);
+            ->putJson(route('user.update'), $newData);
 
         $response->assertStatus(201);
 
@@ -265,7 +267,7 @@ class UserControllerFeaterTest extends TestCase
         $token = $this->jwtService->generateToken($user);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-                         ->deleteJson(route('user.delete'));
+            ->deleteJson(route('user.delete'));
 
         $response->assertStatus(200);
 
@@ -278,5 +280,31 @@ class UserControllerFeaterTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function testItHandlesDatabaseException()
+    {
+        $this->withoutExceptionHandling();
+
+        $data = [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'email' => $this->faker->unique()->safeEmail,
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'address' => $this->faker->address,
+            'phone_number' => $this->faker->phoneNumber,
+        ];
+
+        $userRepositoryMock = Mockery::mock(UserRepository::class);
+        $userRepositoryMock->shouldReceive('create')->andThrow(new \Exception('Database error'));
+        $this->app->instance(UserRepository::class, $userRepositoryMock);
+
+        $response = $this->postJson(route('user.create'), $data);
+
+        $response->assertStatus(500)
+                 ->assertJsonStructure([
+                     'error',
+                 ]);
     }
 }

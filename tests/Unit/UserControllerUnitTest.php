@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\JwtService;
+use App\Repositories\UserRepository;
 use App\Models\User;
 use App\Http\Controllers\API\UserController;
 
@@ -23,7 +24,7 @@ class UserControllerUnitTest extends TestCase
 
 
         // Create an instance of the UserController
-        $controller = new UserController(new JwtService());
+        $controller = new UserController(new JwtService(), new UserRepository());
 
         // Call the handleFileUpload method
         $fileUuid = $controller->testHandleFileUpload($file);

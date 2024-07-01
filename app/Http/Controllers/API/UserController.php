@@ -8,21 +8,24 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Services\JwtService;
+use App\Repositories\UserRepository;
 use App\Models\User;
 use App\Models\File;
 use App\Http\Resources\UserResource;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
     protected $jwtService;
+    protected $userRepository;
 
-    public function __construct(JwtService $jwtService)
+    public function __construct(JwtService $jwtService, UserRepository $userRepository)
     {
         $this->jwtService = $jwtService;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -100,7 +103,9 @@ class UserController extends Controller
             $data['uuid'] = (string) Str::uuid();
             $data['password'] = Hash::make($data['password']);
 
-            $user = User::create($data);
+            // $user = User::create($data);
+
+            $user = $this->userRepository->create($data);
 
             $token = $this->jwtService->generateToken($user);
 
