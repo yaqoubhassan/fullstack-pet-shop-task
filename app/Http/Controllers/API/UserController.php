@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -168,12 +169,12 @@ class UserController extends Controller
         $user->update($request->all());
 
         $response = [
-                'success' => 1,
-                'data' => new UserResource($user->fresh()),
-                'error' => null,
-                'errors' => [],
-                'extra' => []
-            ];
+            'success' => 1,
+            'data' => new UserResource($user->fresh()),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
         return response()->json($response, 201);
     }
 
@@ -195,12 +196,12 @@ class UserController extends Controller
         $user = User::find(auth()->id());
         $user->delete();
         $response = [
-                'success' => 1,
-                'data' => [],
-                'error' => null,
-                'errors' => [],
-                'extra' => []
-            ];
+            'success' => 1,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
         return response()->json($response, 200);
     }
 
@@ -283,6 +284,120 @@ class UserController extends Controller
         ];
 
         return response()->json($response, 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/user/forgot-password",
+     *     tags={"User"},
+     *     summary="Creates a token to reset a user password",
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               required={"email"},
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
+     * )
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Invalid email',
+                'errors' => [],
+                'extra' => []
+            ], 404);
+        }
+
+        $token = Password::createToken($user);
+
+        return response()->json([
+            'success' => 1,
+            'data' => [
+                'reset_token' => $token
+            ],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ], 200);
+    }
+
+       /**
+     * @OA\Post(
+     *     path="/api/v1/user/reset-password",
+     *     tags={"User"},
+     *     summary="Reset user password with token generated from forgot-pawword request",
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               required={"token", "email", "password", "password_confirmation"},
+     *               @OA\Property(property="token", type="string", description="User reset token", example=""),
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
+     *               @OA\Property(property="password", type="string", description="User password", example=""),
+     *               @OA\Property(property="password_confirmation",
+     *               type="string", description="User password", example=""),
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
+     * )
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? response()->json([
+                'success' => 1,
+                'data' => [
+                    'message' => 'Password has been successfully updated'
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ], 200)
+            : response()->json(['success' => 0,
+                'data' => [],
+                'error' => __($status),
+                'errors' => [],
+                'extra' => []], 422);
     }
 
     /**

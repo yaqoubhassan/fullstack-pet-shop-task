@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Mockery;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -303,8 +305,89 @@ class UserControllerFeaterTest extends TestCase
         $response = $this->postJson(route('user.create'), $data);
 
         $response->assertStatus(500)
-                 ->assertJsonStructure([
-                     'error',
-                 ]);
+            ->assertJsonStructure([
+                'error',
+            ]);
+    }
+
+    public function testItReturnsAResetTokenForValidEmail()
+    {
+        User::factory()->create(['email' => 'test@example.com']);
+
+        $response = $this->postJson(route('user.forgot-password'), [
+            'email' => 'test@example.com',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'data' => ['reset_token'],
+            'error',
+            'errors',
+            'extra',
+        ]);
+        $this->assertEquals(1, $response->json('success'));
+        $this->assertNull($response->json('error'));
+    }
+
+    public function testItReturnsAnErrorForNonExistentEmail()
+    {
+        $response = $this->postJson(route('user.forgot-password'), [
+            'email' => 'nonexistent@example.com',
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'success' => 0,
+            'data' => [],
+            'error' => 'Invalid email',
+            'errors' => [],
+            'extra' => []
+        ]);
+    }
+
+    public function testItResetsPasswordWithValidData()
+    {
+        $user = User::factory()->create(['email' => 'test@example.com']);
+        $token = Password::createToken($user);
+
+        $response = $this->postJson(route('password.reset'), [
+            'token' => $token,
+            'email' => 'test@example.com',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => 1,
+            'data' => ['message' => 'Password has been successfully updated'],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ]);
+
+        $this->assertTrue(Hash::check('newpassword123', $user->fresh()->password));
+    }
+
+    public function testItReturnsAnErrorForInvalidToken()
+    {
+        User::factory()->create(['email' => 'test@example.com']);
+
+        $response = $this->postJson(route('password.reset'), [
+            'token' => 'invalid-token',
+            'email' => 'test@example.com',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => 0,
+            'data' => [],
+            'error' => 'This password reset token is invalid.',
+            'errors' => [],
+            'extra' => []
+        ]);
     }
 }
