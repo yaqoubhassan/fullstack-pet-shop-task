@@ -186,4 +186,48 @@ class CategoryTest extends TestCase
 
         $this->assertEquals($categories->pluck('uuid'), $responseCategories->pluck('uuid'));
     }
+
+    public function testSuccessfulCategoryRetrieval()
+    {
+        $category = Category::factory()->create();
+        $response = $this->json('GET', route('category.show', $category->uuid), [], $this->headers);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'title',
+                        'slug',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'error',
+                'errors',
+                'extra'
+            ])
+            ->assertJson([
+                'success' => 1,
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
+
+    public function testCategoryNotFound()
+    {
+        Category::factory()->create();
+        $response = $this->json('GET', route('category.show', 11144555), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Category not found',
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
 }
