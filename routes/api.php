@@ -20,6 +20,7 @@ Route::prefix('v1')->group(function () {
     });
 
     //Category
+    Route::get('categories', [CategoryController::class, 'index'])->middleware('jwt.auth')->name('category.list');
     Route::prefix('category')->middleware('jwt.auth')->group(function () {
         Route::post('create', [CategoryController::class, 'store'])->name('category.create');
     });
