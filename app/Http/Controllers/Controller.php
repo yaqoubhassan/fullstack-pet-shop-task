@@ -17,6 +17,11 @@ namespace App\Http\Controllers;
  *     name="User",
  *     description="User API endpoint"
  * )
+ *  @OA\Tag(
+ *     name="Categories",
+ *     description="Categories API endpoint"
+ * )
+ *
  */
 abstract class Controller
 {
