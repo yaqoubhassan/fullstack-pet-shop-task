@@ -120,11 +120,53 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Fetch a category",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the category"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
-    public function show(string $id)
+    public function show(string $uuid)
     {
-        //
+        $category = Category::where('uuid', $uuid)->first();
+        if (!$category) {
+            $response = [
+            'success' => 0,
+            'data' => [],
+            'error' => "Category not found",
+            'errors' => [],
+            'extra' => []
+            ];
+
+            return response()->json($response, 404);
+        }
+        $response = [
+            'success' => 1,
+            'data' => [
+                new CategoryResource($category)
+            ],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -132,7 +174,6 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
     }
 
     /**
