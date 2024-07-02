@@ -23,5 +23,6 @@ Route::prefix('v1')->group(function () {
     Route::get('categories', [CategoryController::class, 'index'])->middleware('jwt.auth')->name('category.list');
     Route::prefix('category')->middleware('jwt.auth')->group(function () {
         Route::post('create', [CategoryController::class, 'store'])->name('category.create');
+        Route::get('{uuid}', [CategoryController::class, 'show'])->name('category.show');
     });
 });
