@@ -193,23 +193,12 @@ class CategoryTest extends TestCase
         $response = $this->json('GET', route('category.show', $category->uuid), [], $this->headers);
 
         $response->assertStatus(200)
-            ->assertJsonStructure([
-                'success',
-                'data' => [
-                    '*' => [
-                        'uuid',
-                        'title',
-                        'slug',
-                        'created_at',
-                        'updated_at'
-                    ]
-                ],
-                'error',
-                'errors',
-                'extra'
-            ])
             ->assertJson([
                 'success' => 1,
+                'data' => [
+                    'uuid' => $category->uuid,
+                    'title' => $category->title
+                ],
                 'error' => null,
                 'errors' => [],
                 'extra' => []
@@ -229,5 +218,85 @@ class CategoryTest extends TestCase
                 'errors' => [],
                 'extra' => []
             ]);
+    }
+
+    public function testUpdateCategorySuccess()
+    {
+        $category = Category::factory()->create();
+
+        $newTitle = 'Updated Category Title';
+
+        $response = $this->json('PUT', route('category.update', $category->uuid), [
+            'title' => $newTitle
+        ], $this->headers);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => 1,
+                'data' => [
+                        'uuid' => $category->uuid,
+                        'title' => $newTitle,
+                        'slug' => Str::slug($newTitle)
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ]);
+
+        $this->assertDatabaseHas('categories', [
+            'uuid' => $category->uuid,
+            'title' => $newTitle,
+            'slug' => Str::slug($newTitle)
+        ]);
+    }
+
+    public function testUpdateCategoryNotFound()
+    {
+        $response = $this->putJson(route('category.update', Str::uuid()), [
+            'title' => 'New Title'
+        ], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Category not found',
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
+
+    public function testSuccessfullyDeleteCategory()
+    {
+        $category = Category::factory()->create();
+
+        $response = $this->deleteJson(route('category.delete', $category->uuid), [], $this->headers);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => 1,
+                'data' => [],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ]);
+
+        $this->assertDatabaseMissing('categories', [
+            'uuid' => $category->uuid
+        ]);
+    }
+
+    public function testDeleteCategoryNotFound()
+    {
+        $response = $this->deleteJson(route('category.delete', Str::uuid()), [], $this->headers);
+
+        $response->assertStatus(404)
+         ->assertJson([
+             'success' => 0,
+             'data' => [],
+             'error' => 'Category not found',
+             'errors' => [],
+             'extra' => []
+         ]);
     }
 }
