@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\API\Admin;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use App\Models\User;
+use App\Http\Resources\UserResource;
+use App\Http\Resources\UserCollection;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Controllers\Controller;
 
@@ -18,9 +22,27 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $filters = $request->validate([
+            'sortBy' => ['nullable', 'string', Rule::in(['oldest', 'newest'])],
+            'limit' => ['nullable', 'integer'],
+            'page' => ['nullable', 'integer'],
+            'desc' => ['nullable'],
+            'first_name' => ['nullable', 'string'],
+            'email' => ['nullable', 'string'],
+            'phone_number' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'created_at' => ['nullable', 'date_format:Y-m-d'],
+            'is_marketing' => ['nullable', 'boolean'],
+        ]);
+
+        $limit = $filters['limit'] ?? 10;
+        $page = $filters['page'] ?? 1;
+
+        $users = User::filterAndSort($filters)->paginate($limit, ['*'], 'page', $page);
+
+        return new UserCollection($users);
     }
 
     /**
@@ -63,7 +85,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        $response = $this->userService->createUser($data, $request->file('avatar'), true);
+        $response = $this->userService->createUser($data, $request->file('avatar'));
 
         if ($response['success']) {
             return response()->json($response, 201);
