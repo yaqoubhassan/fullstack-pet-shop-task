@@ -21,7 +21,7 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function createUser($data, $avatar = null, $isAdmin = false)
+    public function createUser($data, $avatar = null)
     {
         DB::beginTransaction();
 
@@ -32,7 +32,6 @@ class UserService
 
             $data['uuid'] = (string) Str::uuid();
             $data['password'] = Hash::make($data['password']);
-            $data['is_admin'] = $isAdmin;
 
             $user = $this->userRepository->create($data);
 
