@@ -54,17 +54,16 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $request->validate([
+        $filters = $request->validate([
             'sortBy' => ['nullable', 'string', Rule::in(['oldest', 'newest'])],
             'limit' => ['nullable', 'integer'],
-            'page' => ['nullable', 'integer']
+            'page' => ['nullable', 'integer'],
+            'desc' => ['nullable']
         ]);
-        $filters = $request->only(['sortBy', 'desc', 'limit', 'page']);
 
         $limit = $filters['limit'] ?? 10;
         $page = $filters['page'] ?? 1;
 
-        // Apply filters and sorting
         $categories = Category::filterAndSort($filters)->paginate($limit, ['*'], 'page', $page);
 
         return CategoryResource::collection($categories);
@@ -106,17 +105,7 @@ class CategoryController extends Controller
             ]
         );
 
-        $response = [
-            'success' => 1,
-            'data' => [
-                'uuid' => $category->uuid
-            ],
-            'error' => null,
-            'errors' => [],
-            'extra' => []
-        ];
-
-        return response()->json($response, 201);
+        return $this->successResponse(['uuid' => $category->uuid], 201);
     }
 
     /**
@@ -144,43 +133,125 @@ class CategoryController extends Controller
      */
     public function show(string $uuid)
     {
-        $category = Category::where('uuid', $uuid)->first();
+        $category = $this->getCategoryByUuid($uuid);
         if (!$category) {
-            $response = [
-            'success' => 0,
-            'data' => [],
-            'error' => "Category not found",
-            'errors' => [],
-            'extra' => []
-            ];
-
-            return response()->json($response, 404);
+            return $this->errorResponse("Category not found", 404);
         }
-        $response = [
+
+        return $this->successResponse(new CategoryResource($category), 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Update an existing category",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the category"
+     *     ),
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               required={"title"},
+     *               @OA\Property(property="title", type="string", description="Category title", example="")
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
+     */
+    public function update(Request $request, string $uuid)
+    {
+        $request->validate(['title' => 'filled|string']);
+
+        $category = $this->getCategoryByUuid($uuid);
+        if (!$category) {
+            return $this->errorResponse("Category not found", 404);
+        }
+
+        if ($request->input('title')) {
+            $category->update([
+                'title' => $request->input('title'),
+                'slug' => Str::slug($request->input('title'))
+            ]);
+        }
+
+        return $this->successResponse(new CategoryResource($category->fresh()), 200);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Update an existing category",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the category"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
+     */
+    public function destroy(string $uuid)
+    {
+        $category = $this->getCategoryByUuid($uuid);
+        if (!$category) {
+            return $this->errorResponse("Category not found", 404);
+        }
+
+        $category->delete();
+        return $this->successResponse([], 200);
+    }
+
+    private function getCategoryByUuid(string $uuid)
+    {
+        return Category::where('uuid', $uuid)->first();
+    }
+
+    private function successResponse($data, $status = 200)
+    {
+        return response()->json([
             'success' => 1,
-            'data' => [
-                new CategoryResource($category)
-            ],
+            'data' => $data,
             'error' => null,
             'errors' => [],
             'extra' => []
-        ];
-
-        return response()->json($response, 200);
+        ], $status);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    private function errorResponse($message, $status = 400)
     {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'success' => 0,
+            'data' => [],
+            'error' => $message,
+            'errors' => [],
+            'extra' => []
+        ], $status);
     }
 }
