@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\JwtService;
 use App\Repositories\UserRepository;
 use App\Models\User;
@@ -21,12 +22,12 @@ use App\Http\Controllers\Controller;
 class UserController extends Controller
 {
     protected $jwtService;
-    protected $userRepository;
+    protected $userService;
 
-    public function __construct(JwtService $jwtService, UserRepository $userRepository)
+    public function __construct(JwtService $jwtService, UserService $userService)
     {
         $this->jwtService = $jwtService;
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
     }
 
     /**
@@ -46,7 +47,7 @@ class UserController extends Controller
     {
         $response = [
             'success' => 1,
-            'data' => new UserResource($request->attributes->get('user')),
+            'data' => new UserResource(User::find(auth()->id())),
             'error' => null,
             'errors' => [],
             'extra' => []
@@ -92,40 +93,15 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        DB::beginTransaction();
+        $data = $request->validated();
 
-        try {
-            $data = $request->validated();
+        $response = $this->userService->createUser($data, $request->file('avatar'));
 
-            if ($request->hasFile('avatar')) {
-                $data['avatar'] = $this->handleFileUpload($request->file('avatar'));
-            }
-
-            $data['uuid'] = (string) Str::uuid();
-            $data['password'] = Hash::make($data['password']);
-
-            // $user = User::create($data);
-
-            $user = $this->userRepository->create($data);
-
-            $token = $this->jwtService->generateToken($user);
-
-            DB::commit();
-
-            $response = [
-                'success' => 1,
-                'data' => new UserResource($user->fresh(), $token),
-                'error' => null,
-                'errors' => [],
-                'extra' => []
-            ];
-
+        if ($response['success']) {
             return response()->json($response, 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        return response()->json(['error' => $response['error']], 500);
     }
 
     /**
@@ -403,24 +379,24 @@ class UserController extends Controller
     /**
      * Wrapper method to test handleFileUpload.
      */
-    public function testHandleFileUpload($file)
-    {
-        return $this->handleFileUpload($file);
-    }
+    // public function testHandleFileUpload($file)
+    // {
+    //     return $this->handleFileUpload($file);
+    // }
 
-    private function handleFileUpload($file)
-    {
-        $filePath = $file->store('avatars', 'public');
-        $fileUuid = (string) Str::uuid();
+    // private function handleFileUpload($file)
+    // {
+    //     $filePath = $file->store('avatars', 'public');
+    //     $fileUuid = (string) Str::uuid();
 
-        $fileRecord = File::create([
-            'uuid' => $fileUuid,
-            'name' => $file->getClientOriginalName(),
-            'path' => $filePath,
-            'size' => $file->getSize(),
-            'type' => $file->getMimeType(),
-        ]);
+    //     $fileRecord = File::create([
+    //         'uuid' => $fileUuid,
+    //         'name' => $file->getClientOriginalName(),
+    //         'path' => $filePath,
+    //         'size' => $file->getSize(),
+    //         'type' => $file->getMimeType(),
+    //     ]);
 
-        return $fileRecord->uuid;
-    }
+    //     return $fileRecord->uuid;
+    // }
 }
