@@ -14,6 +14,10 @@ namespace App\Http\Controllers;
  *     bearerFormat="JWT"
  * )
  *  @OA\Tag(
+ *     name="Admin",
+ *     description="Admin API endpoint"
+ * )
+ *  @OA\Tag(
  *     name="User",
  *     description="User API endpoint"
  * )

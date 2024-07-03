@@ -5,6 +5,125 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/admin/create": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create an Admin Account",
+                "operationId": "8ca2043cc84e8bd3af0e5e0317b6634a",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "phone_number",
+                                    "address"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "description": "User firstname",
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "last_name": {
+                                        "description": "User lastname",
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "email": {
+                                        "description": "User email",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@email.com"
+                                    },
+                                    "password": {
+                                        "description": "User password",
+                                        "type": "string",
+                                        "example": "secret123"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "User password",
+                                        "example": "secret123"
+                                    },
+                                    "avatar": {
+                                        "description": "Avatar image UUID",
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "address": {
+                                        "description": "User main address",
+                                        "type": "string",
+                                        "example": "Accra, Ghana"
+                                    },
+                                    "phone_number": {
+                                        "description": "User main phone number",
+                                        "type": "string",
+                                        "example": "+233244112444"
+                                    },
+                                    "is_marketing": {
+                                        "description": "User marketing preferences",
+                                        "type": "string",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Page Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/categories": {
             "get": {
                 "tags": [
@@ -880,6 +999,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Admin",
+            "description": "Admin API endpoint"
+        },
         {
             "name": "User",
             "description": "User API endpoint"
