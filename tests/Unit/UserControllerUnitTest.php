@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\UserService;
 use App\Services\JwtService;
 use App\Repositories\UserRepository;
 use App\Models\User;
@@ -24,10 +25,10 @@ class UserControllerUnitTest extends TestCase
 
 
         // Create an instance of the UserController
-        $controller = new UserController(new JwtService(), new UserRepository());
+        $service = new UserService(new JwtService(), new UserRepository());
 
         // Call the handleFileUpload method
-        $fileUuid = $controller->testHandleFileUpload($file);
+        $fileUuid = $service->testHandleFileUpload($file);
 
         // Assert that the file was stored
         Storage::disk('public')->assertExists('avatars/' . $file->hashName());
