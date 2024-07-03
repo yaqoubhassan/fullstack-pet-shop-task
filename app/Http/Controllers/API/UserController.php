@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\JwtService;
-use App\Repositories\UserRepository;
 use App\Models\User;
-use App\Models\File;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\StoreUserRequest;
@@ -47,7 +43,7 @@ class UserController extends Controller
     {
         $response = [
             'success' => 1,
-            'data' => new UserResource(User::find(auth()->id())),
+            'data' => new UserResource(User::find(auth()->id()), null, true),
             'error' => null,
             'errors' => [],
             'extra' => []
