@@ -2,9 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 use App\Http\Controllers\API\CategoryController;
 
 Route::prefix('v1')->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
+    });
+
+
     Route::prefix('user')->group(function () {
         Route::post('create', [UserController::class, 'store'])->name('user.create');
         Route::post('login', [UserController::class, 'login'])->name('user.login');
