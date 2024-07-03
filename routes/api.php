@@ -8,11 +8,7 @@ use App\Http\Controllers\API\CategoryController;
 Route::prefix('v1')->middleware('api')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
-        Route::get('user-listing', function () {
-            return "It finally got here!";
-        })
-            ->middleware(['jwt.auth', 'admin.auth'])
-            ->name('admin.user.list');
+        Route::get('user-listing', [AdminUserController::class, 'index']);
     });
 
 
