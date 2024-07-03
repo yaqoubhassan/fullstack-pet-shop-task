@@ -17,7 +17,7 @@ use App\Models\User;
 use App\Models\JwtToken;
 use App\Models\File;
 
-class UserControllerFeaterTest extends TestCase
+class UserControllerFeatureTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
