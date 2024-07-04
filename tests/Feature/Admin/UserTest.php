@@ -626,4 +626,141 @@ class UserTest extends TestCase
                 'trace' => []
             ]);
     }
+
+    public function testAdminCanLoginWithValidCredentials()
+    {
+        $password = 'secret123';
+        $user = User::factory()->create([
+            'is_admin' => true
+        ]);
+
+        $payload = [
+            'email' => $user->email,
+            'password' => $password,
+        ];
+
+        $response = $this->postJson(route('admin.user.login'), $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'data' => ['token'],
+            'error',
+            'errors',
+            'extra',
+        ]);
+    }
+
+    public function testOnlyAdminUserscanLogin()
+    {
+        $password = 'secret123';
+        $user = User::factory()->create([
+            'is_admin' => false
+        ]);
+
+        $payload = [
+            'email' => $user->email,
+            'password' => $password,
+        ];
+
+        $response = $this->postJson(route('admin.user.login'), $payload);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Failed to authenticate user',
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
+
+    public function testCheckForInvalidCredentials()
+    {
+        $password = 'secret12235';
+        $user = User::factory()->create([
+            'is_admin' => true
+        ]);
+
+        $payload = [
+            'email' => $user->email,
+            'password' => $password,
+        ];
+
+        $response = $this->postJson(route('admin.user.login'), $payload);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Failed to authenticate user',
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
+
+    public function testAdminCanDeleteUser()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->json('DELETE', route('admin.user.delete', $user->uuid), [], $this->headers);
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'success' => true,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ]);
+
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function testAdminAccountCannotBeDeleted()
+    {
+        $user = User::factory()->create([
+            'is_admin' => true
+        ]);
+
+        $response = $this->json('DELETE', route('admin.user.delete', $user->uuid), [], $this->headers);
+
+        $response->assertStatus(401);
+
+        $response->assertJson([
+            'success' => 0,
+            'data' => [],
+            'error' => 'Unauthorized',
+            'errors' => [],
+            'trace' => []
+        ]);
+    }
+
+    public function testAdminCanLogoutSuccessfully()
+    {
+        $user = User::factory()->create(
+            ['is_admin' => true]
+        );
+
+        $token = $this->jwtService->generateToken($user);
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $token,
+        ];
+
+        $response = $this->json('GET', route('admin.user.logout'), [], $headers);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('jwt_tokens', [
+            'user_id' => $user->id,
+            'expires_at' => now()->addHour(),
+        ]);
+
+        $this->assertDatabaseHas('jwt_tokens', [
+            'user_id' => $user->id,
+            'expires_at' => now()
+        ]);
+    }
 }
