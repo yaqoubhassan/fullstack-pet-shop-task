@@ -171,7 +171,27 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/v1/admin/user/{uuid}",
+     *     tags={"Admin"},
+     *     summary="Fetch a user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the user"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
     public function show(string $uuid)
     {
@@ -197,7 +217,49 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/v1/admin/user-edit/{uuid}",
+     *     tags={"Admin"},
+     *     summary="Edit a user account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the user"
+     *     ),
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(property="first_name", type="string", description="User firstname", example=""),
+     *               @OA\Property(property="last_name", type="string", description="User lastname", example=""),
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
+     *               @OA\Property(property="password", type="string", example="", description="User password"),
+     *               @OA\Property(property="password_confirmation", example="", description="User password"),
+     *               @OA\Property(property="avatar", type="string", description="Avatar image UUID", example=""),
+     *               @OA\Property(property="address", type="string",
+     *               description="User main address", example=""),
+     *               @OA\Property(property="phone_number", type="string",
+     *               description="User main phone number", example=""),
+     *               @OA\Property(property="is_marketing", type="string",
+     *               description="User marketing preferences", example=""),
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="201", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
+     * )
      */
     public function update(Request $request, string $uuid)
     {
@@ -247,11 +309,42 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/v1/admin/user-delete/{uuid}",
+     *     tags={"Admin"},
+     *     summary="Delete a User Account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the user"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
     public function destroy(string $uuid)
     {
         $user = User::where('uuid', $uuid)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ], 404);
+        }
+
 
         if ($user->is_admin == true) {
             return response()->json([
@@ -273,6 +366,31 @@ class UserController extends Controller
         return response()->json($response, 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/login",
+     *     tags={"Admin"},
+     *     summary="Login an Admin Account",
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               required={"email", "password"},
+     *               @OA\Property(property="email", type="string",
+     *               format="email", description="User email", example=""),
+     *               @OA\Property(property="password", type="string", example="", description="User password"),
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="200", description="OK"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
+     */
     public function login(LoginRequest $request)
     {
         if (Auth::attempt($request->validated())) {
@@ -310,6 +428,19 @@ class UserController extends Controller
         ], 422);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/logout",
+     *     tags={"Admin"},
+     *     summary="Logout an Admin Account",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent()),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent()),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent()),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent()),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent())
+     * )
+     */
     public function logout()
     {
         $user = User::find(auth()->id());
