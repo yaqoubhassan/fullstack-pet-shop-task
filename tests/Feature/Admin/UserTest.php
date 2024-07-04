@@ -330,24 +330,24 @@ class UserTest extends TestCase
         $response = $this->json('GET', route('admin.user.list', ['created_at' => $filterDate]), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $users = User::where('is_admin', false)->whereDate('created_at', $filterDate)->get();
         $responseUsers = collect($response->json('data'));
@@ -367,27 +367,27 @@ class UserTest extends TestCase
 
         User::factory()->count(5)->create(['is_marketing' => false]);
 
-        $response = $this->json('GET', route('admin.user.list', ['is_marketing' => true]), [], $this->headers);
+        $response = $this->json('GET', route('admin.user.list', ['is_marketing' => 'true']), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $users = User::where([['is_admin', false], ['is_marketing', true]])->get();
         $responseUsers = collect($response->json('data'));
@@ -409,24 +409,24 @@ class UserTest extends TestCase
         $response = $this->json('GET', route('admin.user.list', ['first_name' => $firstName]), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $responseUsers = collect($response->json('data'));
         $this->assertTrue($responseUsers->pluck('first_name')->contains($firstName));
@@ -441,24 +441,24 @@ class UserTest extends TestCase
         $response = $this->json('GET', route('admin.user.list', ['email' => $email]), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $responseUsers = collect($response->json('data'));
         $this->assertTrue($responseUsers->pluck('email')->contains($email));
@@ -473,24 +473,24 @@ class UserTest extends TestCase
         $response = $this->json('GET', route('admin.user.list', ['phone_number' => $phoneNumber]), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $responseUsers = collect($response->json('data'));
         $this->assertTrue($responseUsers->pluck('phone_number')->contains($phoneNumber));
@@ -505,26 +505,125 @@ class UserTest extends TestCase
         $response = $this->json('GET', route('admin.user.list', ['address' => $address]), [], $this->headers);
 
         $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uuid',
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'avatar',
-                    'address',
-                    'phone_number',
-                    'is_marketing',
-                    'created_at',
-                    'updated_at'
-                ]
-            ],
-            'links',
-            'meta'
-        ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
 
         $responseUsers = collect($response->json('data'));
         $this->assertTrue($responseUsers->pluck('address')->contains($address));
+    }
+
+    public function testFetchUserByUuid()
+    {
+        $user = User::factory()->create();
+        $response = $this->json('GET', route('admin.user.show', $user->uuid), [], $this->headers);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => 1,
+                'data' => [
+                    'uuid' => $user->uuid,
+                    'first_name' => $user->first_name
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ]);
+    }
+
+    public function testReturnErrorMessageWhenFetchingUserWithInvalidUuid()
+    {
+        $response = $this->json('GET', route('admin.user.show', 'invalid-uuid'), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ]);
+    }
+
+    public function testUpdateUserByUuid()
+    {
+        $user = User::factory()->create();
+
+        $newData = [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'email' => $this->faker->unique()->safeEmail,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+            'address' => $this->faker->address,
+            'phone_number' => substr($this->faker->phoneNumber(), 0, 15),
+            'is_marketing' => $this->faker->boolean,
+        ];
+
+        $response = $this->json('PUT', route('admin.user.update', $user->uuid), $newData, $this->headers);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'first_name' => $newData['first_name'],
+            'last_name' => $newData['last_name'],
+            'email' => $newData['email'],
+            'address' => $newData['address'],
+            'phone_number' => $newData['phone_number'],
+            'is_marketing' => $newData['is_marketing'],
+        ]);
+    }
+
+    public function testReturnErrorMessageWhenUpdatingUserWithInvalidUuid()
+    {
+        $response = $this->json('PUT', route('admin.user.update', 'invalid-uuid'), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ]);
+    }
+
+    public function testAdminAccountCannotBeUpdated()
+    {
+        $user = User::factory()->create([
+            'is_admin' => true
+        ]);
+
+        $newData = [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName
+        ];
+
+        $response = $this->json('PUT', route('admin.user.update', $user->uuid), $newData, $this->headers);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Unauthorized',
+                'errors' => [],
+                'trace' => []
+            ]);
     }
 }
