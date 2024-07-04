@@ -243,7 +243,7 @@ class UserControllerFeatureTest extends TestCase
             'password' => 'newpassword123',
             'password_confirmation' => 'newpassword123',
             'address' => $this->faker->address,
-            'phone_number' => $this->faker->phoneNumber,
+            'phone_number' => substr($this->faker->phoneNumber(), 0, 15),
             'is_marketing' => $this->faker->boolean,
         ];
 
@@ -295,7 +295,7 @@ class UserControllerFeatureTest extends TestCase
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'address' => $this->faker->address,
-            'phone_number' => $this->faker->phoneNumber,
+            'phone_number' => substr($this->faker->phoneNumber, 0, 15),
         ];
 
         $userRepositoryMock = Mockery::mock(UserRepository::class);
