@@ -371,28 +371,4 @@ class UserController extends Controller
                 'errors' => [],
                 'extra' => []], 422);
     }
-
-    /**
-     * Wrapper method to test handleFileUpload.
-     */
-    // public function testHandleFileUpload($file)
-    // {
-    //     return $this->handleFileUpload($file);
-    // }
-
-    // private function handleFileUpload($file)
-    // {
-    //     $filePath = $file->store('avatars', 'public');
-    //     $fileUuid = (string) Str::uuid();
-
-    //     $fileRecord = File::create([
-    //         'uuid' => $fileUuid,
-    //         'name' => $file->getClientOriginalName(),
-    //         'path' => $filePath,
-    //         'size' => $file->getSize(),
-    //         'type' => $file->getMimeType(),
-    //     ]);
-
-    //     return $fileRecord->uuid;
-    // }
 }
