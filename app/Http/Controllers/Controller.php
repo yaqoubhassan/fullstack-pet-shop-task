@@ -25,7 +25,10 @@ namespace App\Http\Controllers;
  *     name="Categories",
  *     description="Categories API endpoint"
  * )
- *
+ *  @OA\Tag(
+ *     name="Brands",
+ *     description="Brands API endpoint"
+ * )
  */
 abstract class Controller
 {
