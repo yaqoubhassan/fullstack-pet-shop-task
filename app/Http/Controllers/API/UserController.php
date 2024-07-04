@@ -39,7 +39,7 @@ class UserController extends Controller
      *     @OA\Response(response="500", description="Internal server error")
      * )
      */
-    public function index(Request $request)
+    public function index()
     {
         $response = [
             'success' => 1,
@@ -206,6 +206,17 @@ class UserController extends Controller
     {
         if (Auth::attempt($request->validated())) {
             $user = User::find(Auth::user()->id);
+
+
+            if ($user->is_admin == true) {
+                return response()->json([
+                    'success' => 0,
+                    'data' => [],
+                    'error' => 'Failed to authenticate user',
+                    'errors' => [],
+                    'extra' => []
+                ], 422);
+            }
             $token = $this->jwtService->generateToken($user);
 
             $response = [
@@ -242,7 +253,7 @@ class UserController extends Controller
      *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent())
      * )
      */
-    public function logout(Request $request)
+    public function logout()
     {
         $user = User::find(auth()->id());
         $this->jwtService->invalidateToken($user);
