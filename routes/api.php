@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\BrandController;
 
 Route::prefix('v1')->middleware('api')->group(function () {
+    //Admin routes
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
         Route::post('login', [AdminUserController::class, 'login'])->name('admin.user.login');
@@ -19,7 +21,7 @@ Route::prefix('v1')->middleware('api')->group(function () {
         });
     });
 
-
+    // User routes
     Route::prefix('user')->group(function () {
         Route::post('create', [UserController::class, 'store'])->name('user.create');
         Route::post('login', [UserController::class, 'login'])->name('user.login');
@@ -34,12 +36,25 @@ Route::prefix('v1')->middleware('api')->group(function () {
         });
     });
 
-    //Category
-    Route::get('categories', [CategoryController::class, 'index'])->middleware('jwt.auth')->name('category.list');
-    Route::prefix('category')->middleware('jwt.auth')->group(function () {
-        Route::post('create', [CategoryController::class, 'store'])->name('category.create');
+    //Brands
+    Route::get('brands', [BrandController::class, 'index'])->name('brand.list');
+    Route::prefix('brand')->group(function () {
+        Route::get('{uuid}', [BrandController::class, 'show'])->name('brand.show');
+        Route::middleware('admin.auth')->group(function () {
+            Route::post('create', [BrandController::class, 'store'])->name('brand.create');
+            Route::put('{uuid}', [BrandController::class, 'update'])->name('brand.update');
+            Route::delete('{uuid}', [BrandController::class, 'destroy'])->name('brand.delete');
+        });
+    });
+
+    //Categories
+    Route::get('categories', [CategoryController::class, 'index'])->name('category.list');
+    Route::prefix('category')->group(function () {
         Route::get('{uuid}', [CategoryController::class, 'show'])->name('category.show');
-        Route::put('{uuid}', [CategoryController::class, 'update'])->name('category.update');
-        Route::delete('{uuid}', [CategoryController::class, 'destroy'])->name('category.delete');
+        Route::middleware('admin.auth')->group(function () {
+            Route::post('create', [CategoryController::class, 'store'])->name('category.create');
+            Route::put('{uuid}', [CategoryController::class, 'update'])->name('category.update');
+            Route::delete('{uuid}', [CategoryController::class, 'destroy'])->name('category.delete');
+        });
     });
 });
