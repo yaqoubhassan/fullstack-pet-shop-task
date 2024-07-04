@@ -74,9 +74,9 @@ class User extends Authenticatable
 
         if (isset($filters['desc'])) {
             if ($filters['desc'] === true || $filters['desc'] === 'true') {
-                $query->orderBy('title', 'desc');
+                $query->orderBy('first_name', 'desc');
             } elseif ($filters['desc'] === false || $filters['desc'] === 'false') {
-                $query->orderBy('title', 'asc');
+                $query->orderBy('first_name', 'asc');
             }
         }
 
@@ -85,7 +85,11 @@ class User extends Authenticatable
         }
 
         if (isset($filters['is_marketing'])) {
-            $query->where('is_marketing', $filters['is_marketing']);
+            if ($filters['is_marketing'] === true || $filters['is_marketing'] === 'true') {
+                $query->where('is_marketing', true);
+            } elseif ($filters['is_marketing'] === false || $filters['is_marketing'] === 'false') {
+                $query->where('is_marketing', false);
+            }
         }
 
         if (isset($filters['first_name'])) {
