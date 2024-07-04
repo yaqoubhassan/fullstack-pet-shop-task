@@ -185,12 +185,12 @@ class UserControllerFeatureTest extends TestCase
         // Assert token is invalidated in the database
         $this->assertDatabaseMissing('jwt_tokens', [
             'user_id' => $user->id,
-            'expires_at' => Carbon::now()->addHour(),  // The token should no longer be valid
+            'expires_at' => now()->addHour(),  // The token should no longer be valid
         ]);
 
         $this->assertDatabaseHas('jwt_tokens', [
             'user_id' => $user->id,
-            'expires_at' => Carbon::now(),  // Token should be expired
+            'expires_at' => now(),  // Token should be expired
         ]);
     }
 
