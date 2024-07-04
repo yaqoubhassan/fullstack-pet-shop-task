@@ -3,20 +3,26 @@
 namespace App\Http\Controllers\API\Admin;
 
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use App\Services\JwtService;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
     protected $userService;
+    protected $jwtService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, JwtService $jwtService)
     {
         $this->userService = $userService;
+        $this->jwtService = $jwtService;
     }
 
     /**
@@ -167,24 +173,155 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $uuid)
     {
-        //
+        $user = User::where('uuid', $uuid)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => 1,
+            'data' => new UserResource($user, null, true),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $uuid)
     {
-        //
+        $user = User::where('uuid', $uuid)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ], 404);
+        }
+
+        $request->validate([
+            'first_name' => 'filled|string|max:255',
+            'last_name' => 'filled|string|max:255',
+            'email' => 'filled|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'filled|string|min:8|confirmed',
+            'address' => 'filled|string',
+            'phone_number' => 'filled|string|max:15',
+            'is_marketing' => 'boolean',
+            'is_admin' => 'boolean',
+            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,bmp|max:2048',
+        ]);
+
+        if ($user->is_admin == true) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Unauthorized',
+                'errors' => [],
+                'trace' => []
+            ], 401);
+        }
+        $user->update($request->all());
+
+        $response = [
+            'success' => 1,
+            'data' => new UserResource($user->fresh(), null, true),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 201);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $uuid)
     {
-        //
+        $user = User::where('uuid', $uuid)->first();
+
+        if ($user->is_admin == true) {
+            return response()->json([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Unauthorized',
+                'errors' => [],
+                'trace' => []
+            ], 401);
+        }
+        $user->delete();
+        $response = [
+            'success' => 1,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function login(LoginRequest $request)
+    {
+        if (Auth::attempt($request->validated())) {
+            $user = User::find(Auth::user()->id);
+
+            if ($user->is_admin == false) {
+                return response()->json([
+                    'success' => 0,
+                    'data' => [],
+                    'error' => 'Failed to authenticate user',
+                    'errors' => [],
+                    'extra' => []
+                ], 422);
+            }
+            $token = $this->jwtService->generateToken($user);
+
+            $response = [
+                'success' => 1,
+                'data' => [
+                    'token' => $token
+                ],
+                'error' => null,
+                'errors' => [],
+                'extra' => []
+            ];
+            return response()->json($response, 200);
+        }
+
+        return response()->json([
+            'success' => 0,
+            'data' => [],
+            'error' => 'Failed to authenticate user',
+            'errors' => [],
+            'extra' => []
+        ], 422);
+    }
+
+    public function logout()
+    {
+        $user = User::find(auth()->id());
+        $this->jwtService->invalidateToken($user);
+
+        $response = [
+            'success' => 1,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 200);
     }
 }
