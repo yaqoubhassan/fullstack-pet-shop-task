@@ -6,7 +6,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Models\User;
-use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Controllers\Controller;
@@ -19,8 +18,79 @@ class UserController extends Controller
     {
         $this->userService = $userService;
     }
+
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/v1/admin/user-listing",
+     *     tags={"Admin"},
+     *     summary="List all users",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sortBy",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"newest", "oldest"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="desc",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Parameter(
+     *         name="first_name",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="phone_number",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="address",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="created_at",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string", type="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="is_marketing",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
     public function index(Request $request)
     {
@@ -34,7 +104,7 @@ class UserController extends Controller
             'phone_number' => ['nullable', 'string'],
             'address' => ['nullable', 'string'],
             'created_at' => ['nullable', 'date_format:Y-m-d'],
-            'is_marketing' => ['nullable', 'boolean'],
+            'is_marketing' => ['nullable'],
         ]);
 
         $limit = $filters['limit'] ?? 10;
