@@ -16,7 +16,6 @@ class CategoryController extends Controller
      *     path="/api/v1/categories",
      *     tags={"Categories"},
      *     summary="List all categories",
-     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
@@ -113,7 +112,6 @@ class CategoryController extends Controller
      *     path="/api/v1/category/{uuid}",
      *     tags={"Categories"},
      *     summary="Fetch a category",
-     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="uuid",
      *         in="path",
@@ -198,7 +196,7 @@ class CategoryController extends Controller
      * @OA\Delete(
      *     path="/api/v1/category/{uuid}",
      *     tags={"Categories"},
-     *     summary="Update an existing category",
+     *     summary="Delete an existing category",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="uuid",
