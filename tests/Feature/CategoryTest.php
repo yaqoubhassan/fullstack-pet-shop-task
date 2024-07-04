@@ -24,7 +24,9 @@ class CategoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create([
+            'is_admin' => true
+        ]);
         $this->jwtService = new JwtService();
 
         $this->token = $this->jwtService->generateToken($this->user);
