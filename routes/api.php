@@ -8,8 +8,13 @@ use App\Http\Controllers\API\CategoryController;
 Route::prefix('v1')->middleware('api')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
+        Route::post('login', [AdminUserController::class, 'login'])->name('admin.user.login');
+
         Route::middleware('admin.auth')->group(function () {
             Route::get('user-listing', [AdminUserController::class, 'index'])->name('admin.user.list');
+            Route::get('user/{uuid}', [AdminUserController::class, 'show'])->name('admin.user.show');
+            Route::put('user-edit/{uuid}', [AdminUserController::class, 'update'])->name('admin.user.update');
+            Route::delete('user-delete/{uuid}', [AdminUserController::class, 'destroy'])->name('admin.user.delete');
         });
     });
 
