@@ -25,6 +25,22 @@ class UserController extends Controller
         $this->jwtService = $jwtService;
     }
 
+    private function getUserByUuid(string $uuid)
+    {
+        return User::where('uuid', $uuid)->first();
+    }
+
+    private function createErrorResponse(string $message, int $status)
+    {
+        return response()->json([
+            'success' => 0,
+            'data' => [],
+            'error' => $message,
+            'errors' => [],
+            'trace' => []
+        ], $status);
+    }
+
     /**
      * @OA\Get(
      *     path="/api/v1/admin/user-listing",
@@ -195,16 +211,10 @@ class UserController extends Controller
      */
     public function show(string $uuid)
     {
-        $user = User::where('uuid', $uuid)->first();
+        $user = $this->getUserByUuid($uuid);
 
         if (!$user) {
-            return response()->json([
-                'success' => 0,
-                'data' => [],
-                'error' => 'User not found',
-                'errors' => [],
-                'trace' => []
-            ], 404);
+            return $this->createErrorResponse('User not found', 404);
         }
 
         return response()->json([
@@ -263,16 +273,10 @@ class UserController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
-        $user = User::where('uuid', $uuid)->first();
+        $user = $this->getUserByUuid($uuid);
 
         if (!$user) {
-            return response()->json([
-                'success' => 0,
-                'data' => [],
-                'error' => 'User not found',
-                'errors' => [],
-                'trace' => []
-            ], 404);
+            return $this->createErrorResponse('User not found', 404);
         }
 
         $request->validate([
@@ -333,18 +337,11 @@ class UserController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $user = User::where('uuid', $uuid)->first();
+        $user = $this->getUserByUuid($uuid);
 
         if (!$user) {
-            return response()->json([
-                'success' => 0,
-                'data' => [],
-                'error' => 'User not found',
-                'errors' => [],
-                'trace' => []
-            ], 404);
+            return $this->createErrorResponse('User not found', 404);
         }
-
 
         if ($user->is_admin == true) {
             return response()->json([
