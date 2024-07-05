@@ -31,13 +31,13 @@ class UserControllerUnitTest extends TestCase
         $fileUuid = $service->testHandleFileUpload($file);
 
         // Assert that the file was stored
-        Storage::disk('public')->assertExists('avatars/' . $file->hashName());
+        Storage::disk('public')->assertExists('pet-shop/' . $file->hashName());
 
         // Assert that a record was created in the files table
         $this->assertDatabaseHas('files', [
             'uuid' => $fileUuid,
             'name' => 'avatar.jpg',
-            'path' => 'avatars/' . $file->hashName(),
+            'path' => 'pet-shop/' . $file->hashName(),
         ]);
     }
 
