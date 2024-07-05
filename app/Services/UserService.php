@@ -68,7 +68,7 @@ class UserService
 
     private function handleFileUpload($file)
     {
-        $filePath = $file->store('pet-shop/avatars', 'public');
+        $filePath = $file->store('pet-shop', 'public');
         $fileUuid = (string) Str::uuid();
 
         $fileRecord = File::create([
