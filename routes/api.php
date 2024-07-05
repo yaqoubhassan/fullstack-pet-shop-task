@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
@@ -63,5 +64,10 @@ Route::prefix('v1')->middleware('api')->group(function () {
             Route::put('{uuid}', [CategoryController::class, 'update'])->name('category.update');
             Route::delete('{uuid}', [CategoryController::class, 'destroy'])->name('category.delete');
         });
+    });
+
+    //Products
+    Route::middleware('jwt.auth')->group(function () {
+        Route::post('product/create', [ProductController::class, 'store'])->name('product.create');
     });
 });
