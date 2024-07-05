@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\Admin\UserController as AdminUserController;
+use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 
 Route::prefix('v1')->middleware('api')->group(function () {
     //Admin routes
@@ -34,6 +35,12 @@ Route::prefix('v1')->middleware('api')->group(function () {
             Route::put('edit', [UserController::class, 'update'])->name('user.update');
             Route::delete('/', [UserController::class, 'destroy'])->name('user.delete');
         });
+    });
+
+    //Files
+    Route::prefix('file')->group(function () {
+        Route::post('upload', [FileController::class, 'uploadFile'])->middleware('jwt.auth')->name('file.upload');
+        Route::get('{uuid}', [FileController::class, 'downloadFile'])->name('file.download');
     });
 
     //Brands
