@@ -1280,6 +1280,113 @@
                 }
             }
         },
+        "/api/v1/product/create": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product",
+                "operationId": "7ccf20b524748aea62395024e031368f",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "category_uuid",
+                                    "title",
+                                    "price",
+                                    "description",
+                                    "metadata"
+                                ],
+                                "properties": {
+                                    "category_uuid": {
+                                        "description": "Category UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": {
+                                        "description": "Product title",
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "description": "Product price",
+                                        "type": "number"
+                                    },
+                                    "description": {
+                                        "description": "Product description",
+                                        "type": "string"
+                                    },
+                                    "metadata": {
+                                        "properties": {
+                                            "brand": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Page Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/user": {
             "get": {
                 "tags": [
@@ -1881,6 +1988,10 @@
         {
             "name": "File",
             "description": "File API endpoint"
+        },
+        {
+            "name": "Products",
+            "description": "Products API endpoint"
         }
     ]
 }
