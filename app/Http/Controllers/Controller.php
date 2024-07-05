@@ -33,6 +33,10 @@ namespace App\Http\Controllers;
  *     name="File",
  *     description="File API endpoint"
  * )
+ * @OA\Tag(
+ *     name="Products",
+ *     description="Products API endpoint"
+ * )
  */
 abstract class Controller
 {
