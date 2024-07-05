@@ -29,6 +29,10 @@ namespace App\Http\Controllers;
  *     name="Brands",
  *     description="Brands API endpoint"
  * )
+ * @OA\Tag(
+ *     name="File",
+ *     description="File API endpoint"
+ * )
  */
 abstract class Controller
 {
