@@ -400,6 +400,45 @@ class UserTest extends TestCase
         });
     }
 
+    public function testFetchUsersFilteredByIsNotMarketing()
+    {
+        User::factory()->count(5)->create(['is_marketing' => true]);
+
+        User::factory()->count(5)->create(['is_marketing' => false]);
+
+        $response = $this->json('GET', route('admin.user.list', ['is_marketing' => 'false']), [], $this->headers);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'uuid',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'avatar',
+                        'address',
+                        'phone_number',
+                        'is_marketing',
+                        'created_at',
+                        'updated_at'
+                    ]
+                ],
+                'links',
+                'meta'
+            ]);
+
+        $users = User::where([['is_admin', false], ['is_marketing', false]])->get();
+        $responseUsers = collect($response->json('data'));
+
+        $this->assertCount($users->count(), $responseUsers);
+        $this->assertSame($users->pluck('uuid')->toArray(), $responseUsers->pluck('uuid')->toArray());
+
+        $users->each(function ($user) use ($response) {
+            $response->assertJsonFragment(['uuid' => $user->uuid]);
+        });
+    }
+
     public function testFetchUsersFilteredByFirstName()
     {
         $firstName = 'John';
@@ -716,6 +755,22 @@ class UserTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function testReturnsErrorMessageIfUserDoesNotExist()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->json('DELETE', route('admin.user.delete', 'invalid-uuid'), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'User not found',
+                'errors' => [],
+                'trace' => []
+            ]);
     }
 
     public function testAdminAccountCannotBeDeleted()
