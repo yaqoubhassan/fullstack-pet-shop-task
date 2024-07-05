@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Product;
 
 class Category extends Model
 {
@@ -15,6 +16,11 @@ class Category extends Model
         'title',
         'slug'
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category_uuid', 'uuid');
+    }
 
     /**
      * Scope a query to apply filters and sorting.
