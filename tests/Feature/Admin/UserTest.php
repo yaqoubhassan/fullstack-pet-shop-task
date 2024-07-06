@@ -815,7 +815,7 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('jwt_tokens', [
             'user_id' => $user->id,
-            'expires_at' => now()
+            'expires_at' => now()->format('Y-m-d H:i:s')
         ]);
     }
 }
