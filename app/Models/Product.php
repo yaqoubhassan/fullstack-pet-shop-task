@@ -34,10 +34,21 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_uuid', 'uuid');
     }
 
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(Brand::class, 'metadata->brand', 'uuid');
-    }
+    // public function brand(): BelongsTo
+    // {
+    //     return $this->belongsTo(Brand::class, 'metadata->0->brand', 'uuid');
+    // }
+
+    // public function getBrandAttribute()
+    // {
+    //     $metadata = $this->metadata;
+
+    //     if (isset($metadata[0]['brand'])) {
+    //         return Brand::where('uuid', $metadata[0]['brand'])->first();
+    //     }
+
+    //     return null;
+    // }
 
     public function image(): BelongsTo
     {

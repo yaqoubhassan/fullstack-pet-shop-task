@@ -14,10 +14,10 @@ class Brand extends Model
 
     protected $fillable = ['uuid', 'title', 'slug'];
 
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class, 'metadata->brand', 'uuid');
-    }
+    // public function products(): HasMany
+    // {
+    //     return $this->hasMany(Product::class, 'metadata->brand', 'uuid');
+    // }
 
     public function scopeFilterAndSort(Builder $query, array $filters): Builder
     {
