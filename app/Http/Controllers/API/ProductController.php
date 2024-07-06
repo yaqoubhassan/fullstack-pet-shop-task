@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    private function getUserByUuid(string $uuid)
+    private function getProductByUuid(string $uuid)
     {
         return Product::where('uuid', $uuid)->first();
     }
@@ -185,7 +185,7 @@ class ProductController extends Controller
      */
     public function show(string $uuid)
     {
-        $product = $this->getUserByUuid($uuid);
+        $product = $this->getProductByUuid($uuid);
 
         if (!$product) {
             return $this->createErrorResponse('Product not found', 404);
@@ -201,11 +201,49 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Update an existing product",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the product"
+     *     ),
+     *     @OA\RequestBody(
+     *       @OA\JsonContent(),
+     *       @OA\MediaType(
+     *           mediaType="application/x-www-form-urlencoded",
+     *           @OA\Schema(
+     *               type="object",
+     *               @OA\Property(property="category_uuid",
+     *                  type="string",description="Category UUID", example=""),
+     *                  @OA\Property(property="title", type="string", description="Product title", example=""),
+     *                  @OA\Property(property="price", type="number", description="Product price", example=""),
+     *                  @OA\Property(property="description", type="string", description="Product description", example=""),
+     *                  @OA\Property(property="metadata", type="object",
+     *                          @OA\Property(property="image", type="string", format="uuid", example=""),
+     *                          @OA\Property(property="brand", type="string", format="uuid", example="")
+     *                  )
+     *           ),
+     *       ),
+     *     ),
+     *     @OA\Response(response="201", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized", @OA\JsonContent(),),
+     *     @OA\Response(response="404", description="Page Not Found", @OA\JsonContent(),),
+     *     @OA\Response(response="422", description="Unprocessable Entity", @OA\JsonContent(),),
+     *     @OA\Response(response="500", description="Internal server error", @OA\JsonContent(),)
+     * )
      */
     public function update(Request $request, string $uuid)
     {
-        $product = $this->getUserByUuid($uuid);
+        $product = $this->getProductByUuid($uuid);
 
         if (!$product) {
             return $this->createErrorResponse('Product not found', 404);
@@ -234,11 +272,31 @@ class ProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Delete a Product",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the delete"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
     public function destroy(string $uuid)
     {
-        $product = $this->getUserByUuid($uuid);
+        $product = $this->getProductByUuid($uuid);
 
         if (!$product) {
             return $this->createErrorResponse('Product not found', 404);
