@@ -12,6 +12,21 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
+    private function getUserByUuid(string $uuid)
+    {
+        return Product::where('uuid', $uuid)->first();
+    }
+
+    private function createErrorResponse(string $message, int $status)
+    {
+        return response()->json([
+            'success' => 0,
+            'data' => [],
+            'error' => $message,
+            'errors' => [],
+            'trace' => []
+        ], $status);
+    }
     /**
      * @OA\Get(
      *     path="/api/v1/products",
@@ -149,9 +164,21 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $uuid)
     {
-        //
+        $product = $this->getUserByUuid($uuid);
+
+        if (!$product) {
+            return $this->createErrorResponse('Product not found', 404);
+        }
+
+        return response()->json([
+            'success' => 1,
+            'data' => new ProductResource($product),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ], 200);
     }
 
     /**
