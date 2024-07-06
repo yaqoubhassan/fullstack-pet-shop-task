@@ -161,8 +161,27 @@ class ProductController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
+     /**
+     * @OA\Get(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Fetch a product",
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             format="uuid"
+     *         ),
+     *         description="UUID of the product"
+     *     ),
+     *     @OA\Response(response="200", description="OK", @OA\JsonContent(),),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="404", description="Page Not Found"),
+     *     @OA\Response(response="422", description="Unprocessable Entity"),
+     *     @OA\Response(response="500", description="Internal server error")
+     * )
      */
     public function show(string $uuid)
     {
