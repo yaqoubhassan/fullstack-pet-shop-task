@@ -67,7 +67,10 @@ Route::prefix('v1')->middleware('api')->group(function () {
     });
 
     //Products
-    Route::middleware('jwt.auth')->group(function () {
-        Route::post('product/create', [ProductController::class, 'store'])->name('product.create');
+    Route::get('products', [ProductController::class, 'index'])->name('product.list');
+    Route::prefix('product')->group(function () {
+        Route::middleware('jwt.auth')->group(function () {
+            Route::post('create', [ProductController::class, 'store'])->name('product.create');
+        });
     });
 });

@@ -2,21 +2,38 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\ProductResource;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $filters = $request->validate([
+            'sortBy' => ['nullable', 'string', Rule::in(['oldest', 'newest'])],
+            'limit' => ['nullable', 'integer'],
+            'page' => ['nullable', 'integer'],
+            'desc' => ['nullable'],
+            'category' => ['nullable', 'uuid', 'exists:categories,uuid'],
+            'price' => ['nullable', 'numeric'],
+            'brand' => ['nullable', 'uuid', 'exists:brands,uuid'],
+            'title' => ['nullable', 'string']
+        ]);
+
+        $limit = $filters['limit'] ?? 10;
+        $page = $filters['page'] ?? 1;
+
+        $products = Product::filterAndSort($filters)->paginate($limit, ['*'], 'page', $page);
+
+        return ProductResource::collection($products);
     }
 
     /**
@@ -38,11 +55,10 @@ class ProductController extends Controller
      *                  @OA\Property(property="price", type="number", description="Product price"),
      *                  @OA\Property(property="description", type="string", description="Product description"),
      *                  @OA\Property(property="metadata", type="object",
-     *                     @OA\Property(property="brand", type="string", format="uuid"),
-     *                     @OA\Property(property="image", type="string", format="uuid")
-     *
-     *             )
-     *           ),
+     *                          @OA\Property(property="image", type="string", format="uuid"),
+     *                          @OA\Property(property="brand", type="string", format="uuid")
+     *                  )
+     *              ),
      *         )
      *     ),
      *     @OA\Response(response="201", description="OK", @OA\JsonContent(),),
