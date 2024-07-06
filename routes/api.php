@@ -9,6 +9,7 @@ use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 
 Route::prefix('v1')->middleware('api')->group(function () {
+
     //Admin routes
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
@@ -69,6 +70,7 @@ Route::prefix('v1')->middleware('api')->group(function () {
     //Products
     Route::get('products', [ProductController::class, 'index'])->name('product.list');
     Route::prefix('product')->group(function () {
+        Route::get('{uuid}', [ProductController::class, 'show'])->name('product.show');
         Route::middleware('jwt.auth')->group(function () {
             Route::post('create', [ProductController::class, 'store'])->name('product.create');
         });
