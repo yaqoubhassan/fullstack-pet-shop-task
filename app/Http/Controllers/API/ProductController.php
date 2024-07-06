@@ -236,8 +236,22 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $uuid)
     {
-        //
+        $product = $this->getUserByUuid($uuid);
+
+        if (!$product) {
+            return $this->createErrorResponse('Product not found', 404);
+        }
+
+        $product->delete();
+        $response = [
+            'success' => 1,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 200);
     }
 }
