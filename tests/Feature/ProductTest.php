@@ -354,4 +354,71 @@ class ProductTest extends TestCase
                 'trace' => []
             ]);
     }
+
+    public function testUpdateProductByUuid()
+    {
+        $product = Product::factory()->create();
+
+        $newData = [
+            'title' => 'Updated title'
+        ];
+
+        $response = $this->json('PUT', route('product.update', $product->uuid), $newData, $this->headers);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'title' => $newData['title'],
+        ]);
+    }
+
+    public function testReturnErrorMessageWhenUpdatingProductWithInvalidUuid()
+    {
+        $response = $this->json('PUT', route('product.update', 'invalid-uuid'), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Product not found',
+                'errors' => [],
+                'trace' => []
+            ]);
+    }
+
+    public function testDeleteProduct()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->json('DELETE', route('product.delete', $product->uuid), [], $this->headers);
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'success' => true,
+            'data' => [],
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ]);
+
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    public function testReturnsErrorMessageIfProductDoesNotExist()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->json('DELETE', route('product.delete', 'invalid-uuid'), [], $this->headers);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Product not found',
+                'errors' => [],
+                'trace' => []
+            ]);
+    }
 }
