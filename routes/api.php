@@ -73,6 +73,7 @@ Route::prefix('v1')->middleware('api')->group(function () {
         Route::get('{uuid}', [ProductController::class, 'show'])->name('product.show');
         Route::middleware('jwt.auth')->group(function () {
             Route::post('create', [ProductController::class, 'store'])->name('product.create');
+            Route::put('{uuid}', [ProductController::class, 'update'])->name('product.update');
         });
     });
 });
