@@ -50,10 +50,10 @@ class Product extends Model
     //     return null;
     // }
 
-    public function image(): BelongsTo
-    {
-        return $this->belongsTo(File::class, 'metadata->image', 'uuid');
-    }
+    // public function image(): BelongsTo
+    // {
+    //     return $this->belongsTo(File::class, 'metadata->image', 'uuid');
+    // }
 
     public function scopeWhereMetadataBrand($query, $brand)
     {

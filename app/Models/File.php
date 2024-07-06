@@ -13,8 +13,8 @@ class File extends Model
 
     protected $fillable = ['uuid', 'name', 'path', 'size', 'type'];
 
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class, 'metadata->image', 'uuid');
-    }
+    // public function products(): HasMany
+    // {
+    //     return $this->hasMany(Product::class, 'metadata->image', 'uuid');
+    // }
 }
