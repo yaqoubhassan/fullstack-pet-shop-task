@@ -14,7 +14,8 @@ Route::prefix('v1')->middleware('api')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
         Route::post('login', [AdminUserController::class, 'login'])->name('admin.user.login');
-        Route::get('logout', [AdminUserController::class, 'logout'])->middleware('admin.auth')->name('admin.user.logout');
+        Route::get('logout', [AdminUserController::class, 'logout'])
+            ->middleware('admin.auth')->name('admin.user.logout');
 
         Route::middleware('admin.auth')->group(function () {
             Route::get('user-listing', [AdminUserController::class, 'index'])->name('admin.user.list');
