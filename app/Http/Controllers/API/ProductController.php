@@ -203,9 +203,34 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $uuid)
     {
-        //
+        $product = $this->getUserByUuid($uuid);
+
+        if (!$product) {
+            return $this->createErrorResponse('Product not found', 404);
+        }
+
+        $request->validate([
+            'category_uuid' => 'filled|exists:categories,uuid',
+            'title' => 'filled|string|max:255',
+            'price' => 'filled|numeric|min:0',
+            'description' => 'filled|string',
+            'metadata' => 'filled',
+            'metadata.*.brand' => 'filled|string',
+            'metadata.*.image' => 'filled|string',
+        ]);
+
+        $product->update($request->all());
+
+        $response = [
+            'success' => 1,
+            'data' => new ProductResource($product->fresh()),
+            'error' => null,
+            'errors' => [],
+            'extra' => []
+        ];
+        return response()->json($response, 201);
     }
 
     /**
