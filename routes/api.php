@@ -74,6 +74,7 @@ Route::prefix('v1')->middleware('api')->group(function () {
         Route::middleware('jwt.auth')->group(function () {
             Route::post('create', [ProductController::class, 'store'])->name('product.create');
             Route::put('{uuid}', [ProductController::class, 'update'])->name('product.update');
+            Route::delete('{uuid}', [ProductController::class, 'destroy'])->name('product.delete');
         });
     });
 });
