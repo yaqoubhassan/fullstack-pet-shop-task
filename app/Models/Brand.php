@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Product;
 
 class Brand extends Model
 {
     use HasFactory;
 
     protected $fillable = ['uuid', 'title', 'slug'];
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class, 'metadata->brand', 'uuid');
+    }
 
     public function scopeFilterAndSort(Builder $query, array $filters): Builder
     {
