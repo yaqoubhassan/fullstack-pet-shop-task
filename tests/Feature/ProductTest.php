@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\File;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Http\Resources\BrandResource;
 
 class ProductTest extends TestCase
 {
@@ -317,5 +318,40 @@ class ProductTest extends TestCase
         $response = $this->json('GET', route('product.list'), ['brand' => $brand->uuid]);
         $response->assertStatus(200)
             ->assertJsonCount(3, 'data');
+    }
+
+    public function testFetchProductByUuid()
+    {
+        $product = Product::factory()->create();
+        $response = $this->json('GET', route('product.show', $product->uuid));
+
+        // dd($product->brand);
+        // dd($response->json('data')['brand']);
+        $response->assertStatus(200)
+         ->assertJson([
+             'success' => 1,
+             'data' => [
+                 'uuid' => $product->uuid,
+                 'category_uuid' => $product->category->uuid,
+                //  'brand' => $product->brand
+             ],
+             'error' => null,
+             'errors' => [],
+             'extra' => []
+         ]);
+    }
+
+    public function testReturnErrorMessageWhenFetchingProductWithInvalidUuid()
+    {
+        $response = $this->json('GET', route('product.show', 'invalid-uuid'));
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'success' => 0,
+                'data' => [],
+                'error' => 'Product not found',
+                'errors' => [],
+                'trace' => []
+            ]);
     }
 }
