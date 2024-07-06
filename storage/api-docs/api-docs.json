@@ -1318,11 +1318,11 @@
                                     },
                                     "metadata": {
                                         "properties": {
-                                            "brand": {
+                                            "image": {
                                                 "type": "string",
                                                 "format": "uuid"
                                             },
-                                            "image": {
+                                            "brand": {
                                                 "type": "string",
                                                 "format": "uuid"
                                             }
