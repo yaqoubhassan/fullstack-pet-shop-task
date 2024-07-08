@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    font-size: 1rem !important;
+    text-rendering: optimizeLegibility;
+}
+
+.v-toolbar__content {
+    height: 80px !important;
+}
+
+.v-btn__overlay {
+    opacity: 0 !important;
+}
+
+.active-side-nav {
+    background-color: #2db479 !important;
+    color: #fff !important;
+}
+
+.v-list-item-title {
+    font-weight: 150 !important;
+}
+
+.v-breadcrumbs-item {
+    padding-left: 0 !important;
+}
