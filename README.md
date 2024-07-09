@@ -50,6 +50,10 @@ For test coverage, you can locate (and open in a browser) the `index.html` file 
     ```
 For the frontend application, copy the url generated from `php artisan serve` command and paste it in a browser.
 
+For the login, I only implemented the admin login endpoint. So to test that functionality, kindly login with The Pet shop API's default admin credentials (`email: admin@buckhill.co.uk` and `password: admin`).
+
+After login (as admin), you can navigate to `Customers` on the side menu to see the implementation of customer listings (user lising endpoint)
+
 ## API docs
 To access and test the API endpoints, paste this url in the browser `{{ baseurl }}/api/documentation`
 
