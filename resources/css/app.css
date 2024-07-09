@@ -27,3 +27,24 @@ html {
 .v-breadcrumbs-item {
     padding-left: 0 !important;
 }
+
+.v-data-table-header__content {
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    line-height: 21.98px;
+    letter-spacing: 0.15px;
+    opacity: 54%;
+}
+
+.v-data-table__td {
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    line-height: 20.02px;
+    letter-spacing: 0.15px;
+    opacity: 87%;
+}
+
+.v-pagination__first,
+.v-pagination__last {
+    display: none !important;
+}

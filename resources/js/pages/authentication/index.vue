@@ -1,5 +1,25 @@
+<script lang="ts" setup>
+import Login from "@/pages/authentication/Login.vue";
+import Register from "@/pages/authentication/Register.vue";
+import { ref } from "vue";
+
+const authType = ref("login");
+const show = ref(false);
+
+const emit = defineEmits(["show-dialog"]);
+
+const changeAuthType = (value: string) => {
+    authType.value = value;
+};
+
+const closeAuthDialog = () => {
+    authType.value = "login";
+    emit("show-dialog", false);
+};
+</script>
+
 <template>
-    <v-dialog v-model="show" width="542">
+    <v-dialog width="542" @update:model-value="closeAuthDialog">
         <v-card
             flat
             elevation="0"
@@ -33,55 +53,9 @@
             <Login
                 v-if="authType === 'login'"
                 @change-auth-type="changeAuthType"
+                @close-auth-dialog="closeAuthDialog"
             />
             <Register v-else @change-auth-type="changeAuthType" />
-
-            <!-- <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <v-btn
-                    text="Close Dialog"
-                    @click="isActive.value = false"
-                ></v-btn>
-            </v-card-actions> -->
         </v-card>
     </v-dialog>
 </template>
-<script>
-import Login from "../authentication/Login.vue";
-import Register from "../authentication/Register.vue";
-export default {
-    props: {
-        value: Boolean,
-        title: String,
-    },
-    components: {
-        Login,
-        Register,
-    },
-    created: function () {
-        this.showTemp = true;
-    },
-    data() {
-        return {
-            authType: "login",
-        };
-    },
-    computed: {
-        show: {
-            get() {
-                return this.value;
-            },
-            set(value) {
-                this.$emit("input", value);
-                this.authType = "login";
-            },
-        },
-    },
-    methods: {
-        changeAuthType(authType) {
-            this.authType = authType;
-        },
-    },
-};
-</script>
