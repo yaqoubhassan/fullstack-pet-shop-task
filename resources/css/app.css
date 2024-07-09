@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    font-size: 1rem !important;
+    text-rendering: optimizeLegibility;
+}
+
+.v-toolbar__content {
+    height: 80px !important;
+}
+
+.v-btn__overlay {
+    opacity: 0 !important;
+}
+
+.active-side-nav {
+    background-color: #2db479 !important;
+    color: #fff !important;
+}
+
+.v-list-item-title {
+    font-weight: 150 !important;
+}
+
+.v-breadcrumbs-item {
+    padding-left: 0 !important;
+}
+
+.v-data-table-header__content {
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    line-height: 21.98px;
+    letter-spacing: 0.15px;
+    opacity: 54%;
+}
+
+.v-data-table__td {
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    line-height: 20.02px;
+    letter-spacing: 0.15px;
+    opacity: 87%;
+}
+
+.v-pagination__first,
+.v-pagination__last {
+    display: none !important;
+}
