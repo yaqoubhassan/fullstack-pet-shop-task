@@ -23,14 +23,14 @@ A fullstack application built with Laravel (on the backend) and Vue.js (on the f
     php artisan migrate
     ```
 
-6. **Run Seeder**: Run the command below to populate the users' table with an admin user account (with default credentials `email: admin@buckhill.co.uk` and `password: secret123`), categories, brands, and order_statues tables with some data for easy testing
+6. **Run Seeder**: Run the command below to populate the users' table with an admin user account (with default credentials `email: admin@buckhill.co.uk` and `password: secret123`), categories, brands, and order_statuses tables with some data for easy testing
 
     ```bash
     php artisan db:seed
     ```
 
 ## Tests
-Execute the command below to run unit/feature tests
+1. Execute the command below to run unit/feature tests
 
     ```bash
     php artisan test
@@ -39,7 +39,7 @@ Execute the command below to run unit/feature tests
 For test coverage, you can locate (and open in a browser) the `index.html` file in the `\reports` folder in the root directory
 
 ## Run Project
-Run the following commands in two separate terminals
+1. Run the following commands in two separate terminals
 
     ```bash
     php artisan serve
