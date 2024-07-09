@@ -17,10 +17,10 @@ class Category extends Model
         'slug'
     ];
 
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'category_uuid', 'uuid');
-    }
+    // public function products()
+    // {
+    //     return $this->hasMany(Product::class, 'category_uuid', 'uuid');
+    // }
 
     /**
      * Scope a query to apply filters and sorting.

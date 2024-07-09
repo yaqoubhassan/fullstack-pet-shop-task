@@ -4,10 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\OrderStatus;
 
-class OrderStatusTableSeeder extends Seeder
+class OrderStatusSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,10 +16,14 @@ class OrderStatusTableSeeder extends Seeder
         $statuses = ['open', 'pending_payment', 'paid', 'shipped', 'cancelled'];
 
         foreach ($statuses as $status) {
-            OrderStatus::firstOrCreate([
-                'uuid' => (string) Str::uuid(),
-                'title' => $status
-            ]);
+            OrderStatus::firstOrCreate(
+                [
+                    'title' => $status
+                ],
+                [
+                    'uuid' => (string) Str::uuid()
+                ]
+            );
         }
     }
 }

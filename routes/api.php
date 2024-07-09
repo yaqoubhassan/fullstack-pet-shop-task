@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
@@ -14,7 +15,8 @@ Route::prefix('v1')->middleware('api')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::post('create', [AdminUserController::class, 'store'])->name('admin.user.create');
         Route::post('login', [AdminUserController::class, 'login'])->name('admin.user.login');
-        Route::get('logout', [AdminUserController::class, 'logout'])->middleware('admin.auth')->name('admin.user.logout');
+        Route::get('logout', [AdminUserController::class, 'logout'])
+            ->middleware('admin.auth')->name('admin.user.logout');
 
         Route::middleware('admin.auth')->group(function () {
             Route::get('user-listing', [AdminUserController::class, 'index'])->name('admin.user.list');
@@ -77,4 +79,15 @@ Route::prefix('v1')->middleware('api')->group(function () {
             Route::delete('{uuid}', [ProductController::class, 'destroy'])->name('product.delete');
         });
     });
+
+    //Payments
+    // Route::middleware('jwt.auth')->group(function () {
+    //     Route::get('payments', [PaymentController::class, 'index'])->name('payment.list');
+    //     Route::prefix('payment')->group(function () {
+    //         Route::post('create', [PaymentController::class, 'store'])->name('payment.create');
+    //         Route::get('{uuid}', [PaymentController::class, 'show'])->name('payment.show');
+    //         Route::put('{uuid}', [PaymentController::class, 'update'])->name('payment.update');
+    //         Route::delete('{uuid}', [PaymentController::class, 'destroy'])->name('payment.delete');
+    //     });
+    // });
 });
