@@ -48,7 +48,7 @@ For test coverage, you can locate (and open in a browser) the `index.html` file 
     ```bash
     npm run dev
     ```
-For the frontend application, copy the url generate from `php artisan serve` command and paste it in a browser.
+For the frontend application, copy the url generated from `php artisan serve` command and paste it in a browser.
 
 ## API docs
 To access and test the API endpoints, paste this url in the browser `{{ baseurl }}/api/documentation`
