@@ -12,14 +12,14 @@ class PaymentResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
-    {
-        return [
-            'uuid' => $this->uuid,
-            'type' => $this->type,
-            'details' => $this->details,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
-        ];
-    }
+    // public function toArray(Request $request): array
+    // {
+    //     return [
+    //         'uuid' => $this->uuid,
+    //         'type' => $this->type,
+    //         'details' => $this->details,
+    //         'created_at' => $this->created_at->toDateTimeString(),
+    //         'updated_at' => $this->updated_at->toDateTimeString(),
+    //     ];
+    // }
 }

@@ -81,13 +81,13 @@ Route::prefix('v1')->middleware('api')->group(function () {
     });
 
     //Payments
-    Route::middleware('jwt.auth')->group(function () {
-        Route::get('payments', [PaymentController::class, 'index'])->name('payment.list');
-        Route::prefix('payment')->group(function () {
-            Route::post('create', [PaymentController::class, 'store'])->name('payment.create');
-            Route::get('{uuid}', [PaymentController::class, 'show'])->name('payment.show');
-            Route::put('{uuid}', [PaymentController::class, 'update'])->name('payment.update');
-            Route::delete('{uuid}', [PaymentController::class, 'destroy'])->name('payment.delete');
-        });
-    });
+    // Route::middleware('jwt.auth')->group(function () {
+    //     Route::get('payments', [PaymentController::class, 'index'])->name('payment.list');
+    //     Route::prefix('payment')->group(function () {
+    //         Route::post('create', [PaymentController::class, 'store'])->name('payment.create');
+    //         Route::get('{uuid}', [PaymentController::class, 'show'])->name('payment.show');
+    //         Route::put('{uuid}', [PaymentController::class, 'update'])->name('payment.update');
+    //         Route::delete('{uuid}', [PaymentController::class, 'destroy'])->name('payment.delete');
+    //     });
+    // });
 });
