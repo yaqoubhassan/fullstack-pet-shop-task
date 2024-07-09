@@ -11,7 +11,7 @@ use App\Models\Product;
 use App\Models\File;
 use App\Models\Category;
 use App\Models\Brand;
-use App\Http\Resources\BrandResource;
+use Illuminate\Support\Facades\File as TestFile;
 
 class ProductTest extends TestCase
 {
@@ -35,6 +35,13 @@ class ProductTest extends TestCase
         $this->headers = [
             'Authorization' => 'Bearer ' . $this->token,
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cleanUpTestFiles();
+
+        parent::tearDown();
     }
 
     public function testItCanCreateAProduct()
@@ -408,7 +415,7 @@ class ProductTest extends TestCase
 
     public function testReturnsErrorMessageIfProductDoesNotExist()
     {
-        $product = Product::factory()->create();
+        Product::factory()->create();
 
         $response = $this->json('DELETE', route('product.delete', 'invalid-uuid'), [], $this->headers);
 
@@ -420,5 +427,14 @@ class ProductTest extends TestCase
                 'errors' => [],
                 'trace' => []
             ]);
+    }
+
+    protected function cleanUpTestFiles()
+    {
+        $directory = storage_path('app/public/pet-shop');
+
+        if (TestFile::exists($directory)) {
+            TestFile::deleteDirectory($directory, true);
+        }
     }
 }

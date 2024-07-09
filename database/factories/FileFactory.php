@@ -18,7 +18,7 @@ class FileFactory extends Factory
     public function definition(): array
     {
         $fileName = $this->faker->word;
-        $filePath = 'pet-shop/' . $this->faker->file('public/storage/pet-shop', storage_path('app/public'), false);
+        $filePath = 'pet-shop/' . $this->faker->file('public/test-file', storage_path('app/public/pet-shop'), false);
         $fileUuid = Str::uuid()->toString();
 
         return [
